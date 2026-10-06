@@ -51,7 +51,7 @@ export default function VideoConverterTool() {
     });
 
     try {
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      const baseURL = 'https://registry.npmmirror.com/@ffmpeg/core/0.12.6/files/dist/umd';
       await ffmpeg.load({
         coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
         wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
