@@ -1,8 +1,8 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 
-const RAPIDAPI_KEY = import.meta.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'auto-download-all-in-one.p.rapidapi.com';
 
 function json(data: unknown, status = 200) {
@@ -18,6 +18,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!url || typeof url !== 'string') {
       return json({ error: '请输入有效的 YouTube 视频链接' }, 400);
     }
+    const RAPIDAPI_KEY = env.RAPIDAPI_KEY as string | undefined;
     if (!RAPIDAPI_KEY) {
       return json({ error: '未配置 RAPIDAPI_KEY 环境变量' }, 500);
     }
