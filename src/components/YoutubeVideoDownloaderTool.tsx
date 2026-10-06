@@ -29,7 +29,7 @@ export default function YoutubeVideoDownloaderTool() {
     setSelected(new Set());
     const out: VideoResult[] = [];
     for (let i = 0; i < links.length; i++) {
-      setProgress(`解析中 ${i + 1}/${links.length}...`);
+      setProgress(`Parsing ${i + 1}/${links.length}...`);
       try {
         const req = await fetch('/api/youtube-downloader', {
           method: 'POST',
@@ -43,7 +43,7 @@ export default function YoutubeVideoDownloaderTool() {
           out.push({ title: data.title, thumbnail: data.thumbnail, video_url: data.video_url, quality: data.quality });
         }
       } catch (e) {
-        out.push({ title: links[i], thumbnail: '', video_url: '', quality: '', error: '请求失败，请检查网络' });
+          out.push({ title: links[i], thumbnail: '', video_url: '', quality: '', error: 'Request failed. Please check your network' });
       }
       setResults([...out]);
     }
@@ -77,7 +77,7 @@ export default function YoutubeVideoDownloaderTool() {
       const zip = new JSZip();
       for (let i = 0; i < chosen.length; i++) {
         const r = chosen[i];
-        setProgress(`打包中 ${i + 1}/${chosen.length}...`);
+        setProgress(`Zipping ${i + 1}/${chosen.length}...`);
         const resp = await fetch(proxyUrl(r));
         if (!resp.ok) continue;
         const blob = await resp.blob();
@@ -91,7 +91,7 @@ export default function YoutubeVideoDownloaderTool() {
       a.click();
       document.body.removeChild(a);
     } catch (e) {
-      alert('打包失败，请重试');
+      alert('Failed to create ZIP. Please try again');
     }
     setZipping(false);
     setProgress('');
@@ -104,10 +104,10 @@ export default function YoutubeVideoDownloaderTool() {
           value={input}
           onChange={e => setInput(e.target.value)}
           rows={4}
-          placeholder={'每行一个 YouTube 链接，支持批量下载\n例如：\nhttps://www.youtube.com/watch?v=...\nhttps://youtu.be/...'}
+          placeholder={'One YouTube link per line, supports batch download\nExamples:\nhttps://www.youtube.com/watch?v=...\nhttps://youtu.be/...'}
           className="w-full bg-base-900 border border-black/10 dark:border-white/10 rounded-xl p-3 text-text-main resize-y"
         />
-        <p className="text-xs text-text-muted mt-2">{links.length > 0 ? `已输入 ${links.length} 个链接` : '每行一个链接'}</p>
+        <p className="text-xs text-text-muted mt-2">{links.length > 0 ? `${links.length} link(s) entered` : 'One link per line'}</p>
       </div>
 
       <div className="flex gap-3 mb-4">
@@ -116,7 +116,7 @@ export default function YoutubeVideoDownloaderTool() {
           disabled={loading || links.length === 0}
           className="flex-1 px-6 py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-xl font-bold transition-colors"
         >
-          {loading ? progress || '解析中...' : `解析全部（${links.length}）`}
+          {loading ? progress || 'Parsing...' : `Parse All (${links.length})`}
         </button>
       </div>
 
@@ -128,14 +128,14 @@ export default function YoutubeVideoDownloaderTool() {
         <div className="mb-4 flex items-center justify-between">
           <label className="flex items-center gap-2 text-sm text-text-main cursor-pointer">
             <input type="checkbox" checked={allSelected} onChange={toggleAll} className="w-4 h-4" />
-            全选（{selected.size}/{validResults.length}）
+             Select All ({selected.size}/{validResults.length})
           </label>
           <button
             onClick={downloadZip}
             disabled={zipping || selected.size === 0}
             className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white rounded-lg font-bold text-sm transition-colors"
           >
-            {zipping ? '打包中...' : `打包 ZIP（${selected.size}）`}
+            {zipping ? 'Zipping...' : `Download ZIP (${selected.size})`}
           </button>
         </div>
       )}
@@ -149,7 +149,7 @@ export default function YoutubeVideoDownloaderTool() {
             {r.thumbnail ? (
               <img src={r.thumbnail} alt="" className="w-20 h-12 object-cover rounded-lg shrink-0" />
             ) : (
-              <div className="w-20 h-12 rounded-lg bg-base-800 flex items-center justify-center shrink-0 text-xs text-text-muted">无图</div>
+              <div className="w-20 h-12 rounded-lg bg-base-800 flex items-center justify-center shrink-0 text-xs text-text-muted">No image</div>
             )}
             <div className="flex-1 min-w-0">
               <p className="text-text-main text-sm font-medium truncate">{r.title}</p>
@@ -165,17 +165,17 @@ export default function YoutubeVideoDownloaderTool() {
                 download
                 className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-sm shrink-0 transition-colors"
               >
-                下载
+                 Download
               </a>
             ) : (
-              <span className="px-3 py-2 text-xs text-red-500 shrink-0">失败</span>
+              <span className="px-3 py-2 text-xs text-red-500 shrink-0">Failed</span>
             )}
           </div>
         ))}
       </div>
 
       {results.length === 0 && !loading && (
-        <p className="text-center text-text-muted text-sm py-6">粘贴链接后点击「解析全部」，即可批量下载。</p>
+        <p className="text-center text-text-muted text-sm py-6">Paste links and click "Parse All" to download in bulk.</p>
       )}
     </div>
   );

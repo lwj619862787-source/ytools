@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Disclaimer - YTools"
+  description="YTools disclaimer, terms of use, and limitations of liability."
+>
+  <div class="max-w-3xl mx-auto px-4 w-full">
+    <div class="glass-panel rounded-3xl p-8 md:p-10 space-y-6 text-text-main">
+      <h1 class="text-3xl font-bold">Disclaimer</h1>
+      <p class="text-sm text-text-muted">Last updated: {new Date().toISOString().slice(0, 10)}</p>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold">1. No Affiliation</h2>
+        <p class="text-text-muted leading-relaxed">
+          YTools is an independent service and is not affiliated with, endorsed by, or sponsored by YouTube,
+          Google LLC, or any other third-party platform. All product names, logos, and brands are property of
+          their respective owners.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold">2. Lawful Use Only</h2>
+        <p class="text-text-muted leading-relaxed">
+          Our tools are provided for personal, lawful use only. You are solely responsible for ensuring that
+          you have the necessary rights and permissions before converting, extracting, or downloading any
+          content. Unauthorized downloading or reproduction of copyrighted material may violate the terms of
+          service of the source platform and applicable law.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold">3. No Warranty</h2>
+        <p class="text-text-muted leading-relaxed">
+          The services are provided on an "as is" and "as available" basis without warranties of any kind,
+          either express or implied, including but not limited to warranties of merchantability, fitness for
+          a particular purpose, or non-infringement.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold">4. Limitation of Liability</h2>
+        <p class="text-text-muted leading-relaxed">
+          To the fullest extent permitted by law, YTools shall not be liable for any direct, indirect,
+          incidental, consequential, or punitive damages arising out of your use of, or inability to use,
+          the services.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold">5. Copyright</h2>
+        <p class="text-text-muted leading-relaxed">
+          We respect the intellectual property of others. If you believe your copyrighted work has been
+          infringed, please review our <a href="/dmca" class="text-primary-500 hover:underline">DMCA Policy</a>.
+        </p>
+      </section>
+
+      <p class="text-xs text-text-muted border-t border-black/10 dark:border-white/10 pt-4">
+        This disclaimer is provided as a general template and does not constitute legal advice. Please review
+        it with a qualified attorney to ensure it meets your specific obligations.
+      </p>
+    </div>
+  </div>
+</Layout>

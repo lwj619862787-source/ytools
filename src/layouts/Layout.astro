@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { title, description, keywords } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ytools.example.com');
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ytools.lwj619862787.workers.dev');
 ---
 
 <!doctype html>
@@ -60,6 +60,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ytools.e
     <footer class="border-t border-black/10 dark:border-white/10 mt-auto bg-base-900/50 backdrop-blur-sm">
       <div class="max-w-5xl mx-auto px-4 py-8 text-center text-sm text-text-muted">
         <p>&copy; {new Date().getFullYear()} YTools. Free, private, in-browser video tools. Files never leave your device.</p>
+        <nav class="flex justify-center items-center gap-4 mt-3">
+          <a href="/disclaimer" class="hover:text-primary-500 transition-colors">Disclaimer</a>
+          <span class="text-text-muted/40">·</span>
+          <a href="/dmca" class="hover:text-primary-500 transition-colors">DMCA</a>
+        </nav>
       </div>
     </footer>
   </body>

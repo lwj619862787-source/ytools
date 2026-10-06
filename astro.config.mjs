@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
-  site: 'https://ytools.example.com',
+  site: 'https://ytools.lwj619862787.workers.dev',
   output: 'server',
   adapter: cloudflare({
     compatibilityFlags: ['nodejs_compat'],

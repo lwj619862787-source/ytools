@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Video, Upload, Download, RefreshCw, Play, Pause, Settings } from 'lucide-react';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
+import { loadFFmpegCore } from '../lib/ffmpeg';
 
 export default function ExtractAudioTool() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -26,11 +27,7 @@ export default function ExtractAudioTool() {
         });
 
         try {
-            const baseURL = 'https://registry.npmmirror.com/@ffmpeg/core/0.12.6/files/dist/umd';
-            await ffmpeg.load({
-                coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-                wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-            });
+            await loadFFmpegCore(ffmpeg);
             setIsLoaded(true);
             setLoadingMsg('');
         } catch (error) {

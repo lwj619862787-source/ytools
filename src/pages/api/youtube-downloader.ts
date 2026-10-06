@@ -16,11 +16,11 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const { url } = await request.json();
     if (!url || typeof url !== 'string') {
-      return json({ error: '请输入有效的 YouTube 视频链接' }, 400);
+      return json({ error: 'Please enter a valid YouTube video link' }, 400);
     }
     const RAPIDAPI_KEY = env.RAPIDAPI_KEY as string | undefined;
     if (!RAPIDAPI_KEY) {
-      return json({ error: '未配置 RAPIDAPI_KEY 环境变量' }, 500);
+      return json({ error: 'RAPIDAPI_KEY is not configured' }, 500);
     }
 
     const res = await fetch(`https://${RAPIDAPI_HOST}/v1/social/autolink`, {
@@ -34,12 +34,12 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     if (!res.ok) {
-      return json({ error: `解析服务暂时不可用（${res.status}），请稍后重试` }, 502);
+      return json({ error: `Parse service is temporarily unavailable (${res.status}). Please try again later` }, 502);
     }
 
     const data = await res.json();
     if (data?.error === true || !Array.isArray(data?.medias)) {
-      return json({ error: '无法解析该链接，请确认为有效的 YouTube 视频地址' }, 422);
+      return json({ error: 'Could not parse this link. Please make sure it is a valid YouTube video URL' }, 422);
     }
 
     const videos = data.medias.filter(
@@ -55,7 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
     const thumbnail = data.thumbnail || data.cover || '';
 
     if (!videoUrl) {
-      return json({ error: '未找到可下载的视频地址' }, 422);
+      return json({ error: 'No downloadable video URL found' }, 422);
     }
 
     return json({
@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
       quality: best?.quality || 'unknown',
     });
   } catch (err: any) {
-    return json({ error: err?.message || '服务器内部错误' }, 500);
+    return json({ error: err?.message || 'Internal server error' }, 500);
   }
 };
 
@@ -76,7 +76,7 @@ export const GET: APIRoute = async ({ request }) => {
   const filename = url.searchParams.get('filename') || 'youtube-video';
 
   if (!target) {
-    return json({ error: '缺少视频地址' }, 400);
+    return json({ error: 'Missing video URL' }, 400);
   }
 
   try {
@@ -86,7 +86,7 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     if (!upstream.ok) {
-      return json({ error: `下载失败（${upstream.status}）` }, 502);
+      return json({ error: `Download failed (${upstream.status})` }, 502);
     }
 
     const cleanName = filename.replace(/\.mp4$/i, '').replace(/[^\w\u4e00-\u9fa5.-]+/g, '_');
@@ -100,6 +100,6 @@ export const GET: APIRoute = async ({ request }) => {
       },
     });
   } catch (err: any) {
-    return json({ error: err?.message || '下载失败' }, 500);
+    return json({ error: err?.message || 'Download failed' }, 500);
   }
 };
