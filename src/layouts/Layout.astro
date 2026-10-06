@@ -12,9 +12,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ytools.l
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
   <head>
     <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="googlebot" content="notranslate" />
     <script is:inline>
       if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
