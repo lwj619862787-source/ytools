@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import YoutubeVideoDownloaderTool from '../components/YoutubeVideoDownloaderTool';
+---
+
+<Layout title="YouTube Video Downloader - Free MP4 Bulk Download | YTools"
+    description="Download YouTube videos as MP4 for free, one by one or in bulk. Paste multiple links and force-download videos directly to your device, or pack them into a ZIP."
+    keywords="youtube downloader, youtube to mp4, download youtube video, bulk youtube downloader, youtube video downloader">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 text-center">YouTube Video Downloader</h1>
+    <p class="text-text-muted text-lg text-center mb-8">
+      Paste one or more YouTube links (one per line) and force-download videos as MP4, or pack them into a ZIP.
+    </p>
+    <YoutubeVideoDownloaderTool client:load />
+  </div>
+</Layout>

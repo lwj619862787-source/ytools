@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string;
+}
+
+const { title, description, keywords } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ytools.example.com');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body class="min-h-screen bg-base-950">
+    <div class="ambient-glow"></div>
+
+    <header class="fixed top-0 w-full z-[100] glass-panel border-b-0 border-black/5 dark:border-white/5">
+      <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center space-x-2 group">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-text-main font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)]">▶</div>
+          <span class="text-xl font-bold tracking-tight">Y<span class="text-text-muted">Tools</span></span>
+        </a>
+        <nav class="hidden md:flex items-center space-x-6 text-sm">
+          <a href="/video-converter" class="text-text-muted hover:text-primary-500 transition-colors">Video Converter</a>
+          <a href="/extract-audio" class="text-text-muted hover:text-primary-500 transition-colors">Extract Audio</a>
+          <a href="/youtube-video-downloader" class="text-text-muted hover:text-primary-500 transition-colors">YouTube Downloader</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="pt-24 pb-16 min-h-screen flex flex-col">
+      <slot />
+    </main>
+
+    <footer class="border-t border-black/10 dark:border-white/10 mt-auto bg-base-900/50 backdrop-blur-sm">
+      <div class="max-w-5xl mx-auto px-4 py-8 text-center text-sm text-text-muted">
+        <p>&copy; {new Date().getFullYear()} YTools. Free, private, in-browser video tools. Files never leave your device.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VideoConverterTool from '../components/VideoConverterTool';
+---
+
+<Layout title="Video Converter - Free Online Format Converter | YTools"
+    description="Convert videos between MP4, WebM, AVI, MOV, and GIF formats for free. All processing happens locally in your browser - nothing is uploaded."
+    keywords="video converter, mp4 to webm, mp4 to gif, webm to mp4, free video converter">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 text-center">Video Converter</h1>
+    <p class="text-text-muted text-lg text-center mb-8">
+      Convert videos between MP4, WebM, AVI, MOV, and GIF formats for free. All processing happens locally in your browser - nothing is uploaded.
+    </p>
+    <VideoConverterTool client:only="react" />
+  </div>
+</Layout>

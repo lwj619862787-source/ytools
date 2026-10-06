@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ExtractAudioTool from '../components/ExtractAudioTool';
+---
+
+<Layout title="Extract Audio from Video - Video to MP3 | YTools"
+    description="Rip MP3 audio tracks from any video file for free. Processed entirely in your browser - nothing is uploaded."
+    keywords="video to mp3, extract audio from video, mp3 extractor, free audio extractor">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 text-center">Extract Audio (Video to MP3)</h1>
+    <p class="text-text-muted text-lg text-center mb-8">
+      Rip MP3 audio tracks from any video file. Processed locally in your browser - nothing is uploaded.
+    </p>
+    <ExtractAudioTool client:only="react" />
+  </div>
+</Layout>
