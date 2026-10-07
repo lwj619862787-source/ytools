@@ -130,7 +130,10 @@ export default function VideoDownloaderTool() {
           placeholder={'One video link per line, supports batch download\nSupports YouTube, TikTok, Instagram, Facebook and more\nExamples:\nhttps://www.youtube.com/watch?v=...\nhttps://www.tiktok.com/@user/video/...'}
           className="w-full bg-base-900 border border-black/10 dark:border-white/10 rounded-xl p-3 text-text-main resize-y"
         />
-        <p className="text-xs text-text-muted mt-2">{links.length > 0 ? `${links.length} link(s) entered` : 'One link per line'}</p>
+        <p className="text-xs text-amber-500/90 mt-2 font-medium">
+          Make sure you have the right to download this content. Copyrighted content is protected — download only videos you own or are authorized to use.
+        </p>
+        <p className="text-xs text-text-muted mt-1">{links.length > 0 ? `${links.length} link(s) entered` : 'One link per line'}</p>
       </div>
 
       <div className="flex gap-3 mb-4">
