@@ -37,6 +37,7 @@ export default function VideoConverterTool() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
   const [outputFormat, setOutputFormat] = useState('mp4');
+  const [hdrToSdr, setHdrToSdr] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef<FFmpeg | null>(null);
@@ -96,6 +97,11 @@ export default function VideoConverterTool() {
 
       if (outputFormat === 'mp4') {
         args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', '-movflags', 'faststart');
+        if (hdrToSdr) {
+          args.push('-vf', 'scale=in_color_matrix=bt2020:out_color_matrix=bt709,format=yuv420p');
+        } else {
+          args.push('-pix_fmt', 'yuv420p');
+        }
       } else if (outputFormat === 'webm') {
         args.push('-c:v', 'libvpx-vp9', '-crf', '30', '-b:v', '0');
       } else if (outputFormat === 'gif') {
@@ -104,6 +110,11 @@ export default function VideoConverterTool() {
         args.push('-c:v', 'mpeg4', '-q:v', '5');
       } else if (outputFormat === 'mov') {
         args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', '22');
+        if (hdrToSdr) {
+          args.push('-vf', 'scale=in_color_matrix=bt2020:out_color_matrix=bt709,format=yuv420p');
+        } else {
+          args.push('-pix_fmt', 'yuv420p');
+        }
       }
 
       args.push('-y', outputName);
@@ -160,7 +171,7 @@ export default function VideoConverterTool() {
           >
             <Upload className="w-12 h-12 text-text-muted mb-4" />
             <p className="text-lg font-bold text-text-main mb-2">Click or Drop Video File</p>
-            <p className="text-sm text-text-muted">Supported: MP4, WebM, AVI, MOV, MKV, GIF</p>
+            <p className="text-sm text-text-muted">支持 MP4 / WebM / AVI / MOV / MKV / GIF（含 iPhone HEVC/HDR）</p>
             <input
               type="file"
               accept={acceptStr}
@@ -217,6 +228,16 @@ export default function VideoConverterTool() {
                       ))}
                     </div>
                   </div>
+
+                  <label className="flex items-center gap-2 text-sm text-text-main cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hdrToSdr}
+                      onChange={(e) => setHdrToSdr(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    HDR 视频转 SDR（iPhone HDR 视频转出偏灰时勾选）
+                  </label>
 
                   <button
                     onClick={processVideo}
