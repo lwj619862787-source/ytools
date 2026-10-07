@@ -171,7 +171,7 @@ export default function VideoConverterTool() {
           >
             <Upload className="w-12 h-12 text-text-muted mb-4" />
             <p className="text-lg font-bold text-text-main mb-2">Click or Drop Video File</p>
-            <p className="text-sm text-text-muted">支持 MP4 / WebM / AVI / MOV / MKV / GIF（含 iPhone HEVC/HDR）</p>
+            <p className="text-sm text-text-muted">Supports MP4 / WebM / AVI / MOV / MKV / GIF (incl. iPhone HEVC/HDR)</p>
             <input
               type="file"
               accept={acceptStr}
@@ -236,7 +236,7 @@ export default function VideoConverterTool() {
                       onChange={(e) => setHdrToSdr(e.target.checked)}
                       className="w-4 h-4"
                     />
-                    HDR 视频转 SDR（iPhone HDR 视频转出偏灰时勾选）
+                    Convert HDR to SDR (check if iPhone HDR video looks washed out)
                   </label>
 
                   <button
