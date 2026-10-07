@@ -2,18 +2,18 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="YTools - Free Video Converter & YouTube Downloader" description="Free, private, in-browser video tools. Convert videos between formats, extract audio, and download YouTube videos — nothing is ever uploaded to a server.">
+<Layout title="YTools - Free Online Video Converter & Audio Extractor" description="Free, private, in-browser video tools. Convert videos between formats and extract audio — nothing is ever uploaded to a server.">
   <div class="max-w-5xl mx-auto px-4 w-full">
     <div class="text-center max-w-3xl mx-auto mb-12">
       <h1 class="text-4xl md:text-5xl font-bold text-text-main mb-4">
         Video Tools, <span class="text-gradient">Private & Free</span>
       </h1>
       <p class="text-text-muted text-lg">
-        Convert, extract, and download videos right in your browser. All processing happens locally — your files never leave your device.
+        Convert videos and extract audio right in your browser. All processing happens locally — your files never leave your device.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <a href="/video-converter" class="glass-panel rounded-3xl p-8 hover:border-primary-500/40 hover:shadow-lg transition-all group">
         <div class="w-14 h-14 rounded-2xl bg-primary-500/15 flex items-center justify-center text-primary-500 mb-5">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -28,14 +28,6 @@ import Layout from '../layouts/Layout.astro';
         </div>
         <h2 class="text-xl font-bold text-text-main mb-2 group-hover:text-primary-500 transition-colors">Extract Audio</h2>
         <p class="text-text-muted text-sm">Rip MP3 audio tracks from any video file, entirely in-browser.</p>
-      </a>
-
-      <a href="/video-downloader" class="glass-panel rounded-3xl p-8 hover:border-primary-500/40 hover:shadow-lg transition-all group">
-        <div class="w-14 h-14 rounded-2xl bg-red-500/15 flex items-center justify-center text-red-500 mb-5">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-        </div>
-        <h2 class="text-xl font-bold text-text-main mb-2 group-hover:text-primary-500 transition-colors">Video Downloader</h2>
-        <p class="text-text-muted text-sm">Paste a link and force-download the video — supports YouTube, TikTok, Instagram &amp; more.</p>
       </a>
     </div>
 
