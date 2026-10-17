@@ -4,6 +4,12 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 import { loadFFmpegCore } from '../lib/ffmpeg';
 
+function getPresetFrom() {
+  if (typeof window === 'undefined') return null;
+  const from = new URLSearchParams(window.location.search).get('from');
+  return from || null;
+}
+
 export default function ExtractAudioTool() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -15,6 +21,8 @@ export default function ExtractAudioTool() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const ffmpegRef = useRef<FFmpeg | null>(null);
+
+    const presetFrom = getPresetFrom();
 
     const loadFFmpeg = async () => {
         if (isLoaded) return;
@@ -110,6 +118,15 @@ export default function ExtractAudioTool() {
                     <Video className="w-6 h-6 text-primary-500" />
                     <h3 className="text-xl font-bold text-text-main">Extract Audio (Video to MP3)</h3>
                 </div>
+
+                {presetFrom && (
+                    <div className="mb-6 p-4 bg-primary-500/10 border border-primary-500/20 rounded-xl text-sm text-text-main flex items-center gap-2">
+                        <span className="font-bold">Preset:</span>
+                        <span className="uppercase">{presetFrom}</span>
+                        <span className="text-text-muted">→</span>
+                        <span className="uppercase">mp3</span>
+                    </div>
+                )}
 
                 {!selectedFile ? (
                     <div 

@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { seoPages, getSeoPageBySlug, type SeoPage } from '../data/seo-pages';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return seoPages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+interface Props {
+  page: SeoPage;
+}
+
+const { page } = Astro.props;
+
+const params = new URLSearchParams();
+if (page.from) params.set('from', page.from);
+if (page.to) params.set('to', page.to);
+const query = params.toString();
+const ctaUrl = `${page.toolPath}${query ? `?${query}` : ''}`;
+
+const faqJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+});
+
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: page.h1,
+  description: page.intro,
+  step: page.steps.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: text,
+  })),
+});
+---
+
+<Layout title={page.title} description={page.description} keywords={page.keywords}>
+  <article class="max-w-4xl mx-auto px-4 py-8">
+    <nav class="text-sm text-text-muted mb-6 flex flex-wrap items-center gap-1.5">
+      <a href="/" class="hover:text-primary-500 transition-colors">Home</a>
+      <span>/</span>
+      <a href={page.toolPath} class="hover:text-primary-500 transition-colors capitalize">{page.toolPath.replace('/', '').replace('-', ' ')}</a>
+      <span>/</span>
+      <span class="text-text-main">{page.h1}</span>
+    </nav>
+
+    <header class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4">{page.h1}</h1>
+      <p class="text-text-muted text-lg max-w-2xl mx-auto">{page.intro}</p>
+    </header>
+
+    <div class="glass-panel rounded-3xl p-8 mb-10 text-center">
+      <a
+        href={ctaUrl}
+        class="inline-flex items-center gap-2 py-4 px-10 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/20 text-lg"
+      >
+        {page.ctaLabel}
+      </a>
+      <p class="text-xs text-text-muted mt-3">Free · No upload · No watermark · Works in your browser</p>
+    </div>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold text-text-main mb-6">How it works</h2>
+      <ol class="space-y-4">
+        {page.steps.map((step, i) => (
+          <li class="flex gap-4 items-start">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-primary-500/15 text-primary-500 flex items-center justify-center font-bold text-sm">{i + 1}</span>
+            <p class="text-text-muted pt-1">{step}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold text-text-main mb-6">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {page.faqs.map((faq) => (
+          <div class="bg-base-900/40 rounded-2xl p-6 border border-black/5 dark:border-white/5">
+            <h3 class="text-text-main font-bold mb-2">{faq.q}</h3>
+            <p class="text-text-muted text-sm">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-bold text-text-main mb-6">Related tools</h2>
+      <div class="flex flex-wrap gap-3">
+        {page.related.map((rel) => (
+          <a
+            href={rel.href}
+            class="px-4 py-2 rounded-xl bg-base-900/40 border border-black/5 dark:border-white/5 text-text-muted hover:text-primary-500 hover:border-primary-500/40 transition-colors text-sm"
+          >
+            {rel.label}
+          </a>
+        ))}
+      </div>
+    </section>
+  </article>
+
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <script type="application/ld+json" set:html={howToJsonLd} />
+</Layout>

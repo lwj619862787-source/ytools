@@ -28,6 +28,19 @@ const outputFormats: FormatOption[] = [
   { value: 'mov', label: 'MOV', mime: 'video/quicktime', ext: '.mov' },
 ];
 
+function getPreset() {
+  if (typeof window === 'undefined') return { from: null, to: null };
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get('from');
+  const to = params.get('to');
+  const validTo = outputFormats.some((f) => f.value === to);
+  const validFrom = inputFormats.some((f) => f.value === from);
+  return {
+    from: from && validFrom ? from : null,
+    to: to && validTo ? to : null,
+  };
+}
+
 export default function VideoConverterTool() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -36,11 +49,13 @@ export default function VideoConverterTool() {
   const [outputUrl, setOutputUrl] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
-  const [outputFormat, setOutputFormat] = useState('mp4');
+  const [outputFormat, setOutputFormat] = useState(() => getPreset().to || 'mp4');
   const [hdrToSdr, setHdrToSdr] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef<FFmpeg | null>(null);
+
+  const presetFrom = getPreset().from;
 
   const loadFFmpeg = async () => {
     if (isLoaded) return;
@@ -160,6 +175,15 @@ export default function VideoConverterTool() {
           <FileVideo className="w-6 h-6 text-primary-500" />
           <h3 className="text-xl font-bold text-text-main">Video Converter</h3>
         </div>
+
+        {(presetFrom || outputFormat) && (
+          <div className="mb-6 p-4 bg-primary-500/10 border border-primary-500/20 rounded-xl text-sm text-text-main flex items-center gap-2">
+            <span className="font-bold">Preset:</span>
+            <span className="uppercase">{presetFrom || 'any video'}</span>
+            <span className="text-text-muted">→</span>
+            <span className="uppercase">{outputFormat}</span>
+          </div>
+        )}
 
         {!selectedFile ? (
           <div

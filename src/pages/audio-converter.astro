@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AudioConverterTool from '../components/AudioConverterTool';
+---
+
+<Layout title="Audio Converter - Free Online Audio Format Converter | YTools"
+    description="Convert audio files between MP3, WAV, M4A, OGG, FLAC, and OPUS formats for free. All processing happens locally in your browser - nothing is uploaded."
+    keywords="audio converter, mp3 to wav, wav to mp3, m4a to mp3, flac to mp3, ogg converter, free audio converter">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 text-center">Audio Converter</h1>
+    <p class="text-text-muted text-lg text-center mb-8">
+      Convert audio files between MP3, WAV, M4A, OGG, FLAC, and OPUS formats for free. All processing happens locally in your browser - nothing is uploaded.
+    </p>
+    <AudioConverterTool client:only="react" />
+  </div>
+</Layout>
