@@ -1,5 +1,4 @@
 import type { FFmpeg } from '@ffmpeg/ffmpeg';
-import { toBlobURL } from '@ffmpeg/util';
 
 const CORE_VERSION = '0.12.9';
 
@@ -9,35 +8,50 @@ const CORE_BASE_URLS = [
   `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/esm`,
 ];
 
-async function rankBaseURLs(): Promise<string[]> {
-  const results = await Promise.allSettled(
-    CORE_BASE_URLS.map(async (baseURL) => {
-      const start = Date.now();
-      const res = await fetch(`${baseURL}/ffmpeg-core.js`, { mode: 'cors' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return { baseURL, time: Date.now() - start };
-    }),
-  );
+export type LoadProgressCallback = (progress: number) => void;
 
-  const ranked = results
-    .filter((r): r is PromiseFulfilledResult<{ baseURL: string; time: number }> => r.status === 'fulfilled')
-    .map((r) => r.value)
-    .sort((a, b) => a.time - b.time)
-    .map((r) => r.baseURL);
+async function fetchToBlobURL(
+  url: string,
+  mime: string,
+  onProgress?: LoadProgressCallback,
+): Promise<string> {
+  const res = await fetch(url, { mode: 'cors' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-  const failed = CORE_BASE_URLS.filter((u) => !ranked.includes(u));
-  return [...ranked, ...failed];
+  const total = Number(res.headers.get('content-length')) || 0;
+  if (!res.body || !total) {
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    onProgress?.(received / total);
+  }
+  return URL.createObjectURL(new Blob(chunks, { type: mime }));
 }
 
-export async function loadFFmpegCore(ffmpeg: FFmpeg): Promise<void> {
-  const baseURLs = await rankBaseURLs();
+export async function loadFFmpegCore(
+  ffmpeg: FFmpeg,
+  onProgress?: LoadProgressCallback,
+): Promise<void> {
   let lastError: unknown;
-  for (const baseURL of baseURLs) {
+  for (const baseURL of CORE_BASE_URLS) {
     try {
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      });
+      const coreURL = await fetchToBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript');
+      const wasmURL = await fetchToBlobURL(
+        `${baseURL}/ffmpeg-core.wasm`,
+        'application/wasm',
+        onProgress,
+      );
+      await ffmpeg.load({ coreURL, wasmURL });
+      onProgress?.(1);
       return;
     } catch (err) {
       lastError = err;

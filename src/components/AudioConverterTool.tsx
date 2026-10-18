@@ -3,6 +3,7 @@ import { Music, Upload, Download, RefreshCw, Play } from 'lucide-react';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 import { loadFFmpegCore } from '../lib/ffmpeg';
+import { MAX_AUDIO_SIZE, MAX_AUDIO_SIZE_MB } from '../lib/constants';
 
 interface FormatOption {
   value: string;
@@ -51,6 +52,7 @@ export default function AudioConverterTool() {
   const [outputUrl, setOutputUrl] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
+  const [loadProgress, setLoadProgress] = useState(0);
   const [outputFormat, setOutputFormat] = useState(() => getPreset().to || 'mp3');
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +71,7 @@ export default function AudioConverterTool() {
     });
 
     try {
-      await loadFFmpegCore(ffmpeg);
+      await loadFFmpegCore(ffmpeg, (p) => setLoadProgress(Math.round(p * 100)));
       setIsLoaded(true);
       setLoadingMsg('');
     } catch (error) {
@@ -79,6 +81,10 @@ export default function AudioConverterTool() {
   };
 
   const handleFile = (file: File) => {
+    if (file.size > MAX_AUDIO_SIZE) {
+      alert(`File is too large for in-browser processing (max ${MAX_AUDIO_SIZE_MB}MB).`);
+      return;
+    }
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
     setOutputUrl(null);
@@ -222,7 +228,14 @@ export default function AudioConverterTool() {
                   {loadingMsg && !isLoaded && (
                     <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-yellow-400 text-sm flex items-start gap-3">
                       <RefreshCw className="w-5 h-5 animate-spin shrink-0" />
-                      <p>{loadingMsg}</p>
+                      <div className="flex-1">
+                        <p>{loadingMsg}</p>
+                        {loadProgress > 0 && (
+                          <div className="mt-2 h-1.5 bg-black/30 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary-500 transition-all" style={{ width: `${loadProgress}%` }} />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
