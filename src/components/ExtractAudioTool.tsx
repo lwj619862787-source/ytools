@@ -5,6 +5,12 @@ import { fetchFile } from '@ffmpeg/util';
 import { loadFFmpegCore } from '../lib/ffmpeg';
 import { MAX_VIDEO_SIZE, MAX_VIDEO_SIZE_MB } from '../lib/constants';
 
+interface AudioTrack {
+  index: number;
+  codec: string;
+  language: string;
+}
+
 function getPresetFrom() {
   if (typeof window === 'undefined') return null;
   const from = new URLSearchParams(window.location.search).get('from');
@@ -20,9 +26,12 @@ export default function ExtractAudioTool() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
     const [loadProgress, setLoadProgress] = useState(0);
+    const [audioTracks, setAudioTracks] = useState<AudioTrack[]>([]);
+    const [selectedTrack, setSelectedTrack] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const ffmpegRef = useRef<FFmpeg | null>(null);
+    const probeFileRef = useRef<File | null>(null);
 
     const presetFrom = getPresetFrom();
 
@@ -46,6 +55,48 @@ export default function ExtractAudioTool() {
         }
     };
 
+    const probeTracks = async (file: File) => {
+        const ffmpeg = ffmpegRef.current;
+        if (!ffmpeg) return;
+        try {
+            const ext = file.name.split('.').pop() || 'mp4';
+            const probeName = `probe.${ext}`;
+            await ffmpeg.writeFile(probeName, await fetchFile(file));
+            await ffmpeg.ffprobe([
+                '-v', 'error',
+                '-select_streams', 'a',
+                '-show_entries', 'stream=codec_name:stream_tags=language',
+                '-of', 'json',
+                probeName,
+                '-o', 'info.json',
+            ]);
+            const data = await ffmpeg.readFile('info.json');
+            const text = new TextDecoder().decode(data as Uint8Array);
+            const info = JSON.parse(text);
+            const tracks: AudioTrack[] = (info.streams || []).map((s: any, i: number) => ({
+                index: i,
+                codec: s.codec_name || '',
+                language: s.tags?.language || 'unknown',
+            }));
+            setAudioTracks(tracks);
+            setSelectedTrack(0);
+            await ffmpeg.deleteFile(probeName);
+            await ffmpeg.deleteFile('info.json');
+        } catch (err) {
+            console.error('Probe error', err);
+            setAudioTracks([]);
+            setSelectedTrack(0);
+        }
+    };
+
+    useEffect(() => {
+        if (isLoaded && probeFileRef.current) {
+            const file = probeFileRef.current;
+            probeFileRef.current = null;
+            probeTracks(file);
+        }
+    }, [isLoaded]);
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -58,7 +109,11 @@ export default function ExtractAudioTool() {
                 setPreviewUrl(URL.createObjectURL(file));
                 setOutputUrl(null);
                 setProgress(0);
-                if (!isLoaded) {
+                setAudioTracks([]);
+                probeFileRef.current = file;
+                if (isLoaded) {
+                    probeTracks(file);
+                } else {
                     loadFFmpeg();
                 }
             } else {
@@ -83,7 +138,8 @@ export default function ExtractAudioTool() {
             await ffmpeg.writeFile(inputName, await fetchFile(selectedFile));
             
             // Run command
-            await ffmpeg.exec(['-i', inputName, '-q:a', '0', '-map', 'a', outputName]);
+            const mapArgs = audioTracks.length > 1 ? ['-map', `0:a:${selectedTrack}`] : ['-map', 'a'];
+            await ffmpeg.exec(['-i', inputName, '-q:a', '0', ...mapArgs, outputName]);
             
             const data = await ffmpeg.readFile(outputName);
             const blob = new Blob([data], { type: 'audio/mpeg' });
@@ -197,6 +253,28 @@ export default function ExtractAudioTool() {
                                     )}
                                     
                                     <div className="bg-base-900/40 p-4 rounded-xl border border-white/5"><p className="text-sm text-text-muted text-center">Click below to extract the audio track and save it as an MP3 file.</p></div>
+
+                                    {audioTracks.length > 1 && (
+                                        <div className="bg-base-900/40 p-4 rounded-xl border border-white/5">
+                                            <label className="text-sm font-medium text-text-main mb-2 block">Audio track:</label>
+                                            <div className="space-y-2">
+                                                {audioTracks.map((track) => (
+                                                    <button
+                                                        key={track.index}
+                                                        onClick={() => setSelectedTrack(track.index)}
+                                                        className={`w-full py-2 px-3 rounded-lg text-sm text-left transition-all ${
+                                                            selectedTrack === track.index
+                                                                ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
+                                                                : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'
+                                                        }`}
+                                                    >
+                                                        Track {track.index + 1}
+                                                        <span className="ml-2 text-xs opacity-70">{track.language}{track.codec ? ` · ${track.codec}` : ''}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <button 
                                         onClick={processVideo}
