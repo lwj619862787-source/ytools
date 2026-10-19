@@ -3,6 +3,72 @@ import Layout from '../layouts/Layout.astro';
 import VideoConverterTool from '../components/VideoConverterTool';
 
 export const prerender = true;
+
+const steps = [
+  'Upload your video by clicking the button or dragging it into the drop zone.',
+  'Choose a compression level (quality) or a target file size.',
+  'Click "Compress" and download your smaller video instantly.',
+];
+
+const faqs = [
+  {
+    q: 'How do I compress a video online?',
+    a: 'Upload your video to the tool above, choose a compression level or a target size, and click "Compress". Processing runs locally in your browser, so your file is never uploaded.',
+  },
+  {
+    q: 'How much can I compress a video without losing quality?',
+    a: 'Most videos can be reduced by 30-70% with little visible quality loss. Use the "Balanced" level, or a target size close to your original, for the best quality-to-size ratio.',
+  },
+  {
+    q: 'Will compressing a video reduce its quality?',
+    a: 'Compression lowers the bitrate, which can soften fine details. The stronger the compression, the more visible the loss. For best results, keep your original resolution and use a moderate compression level.',
+  },
+  {
+    q: 'How do I compress a video for Discord?',
+    a: 'Discord has an 8MB upload limit on free accounts (25MB for Nitro). Choose the "Target size" option and set 8MB, or use our Compress Video to 8MB page.',
+  },
+  {
+    q: 'Is it safe to compress videos online?',
+    a: 'Yes. Unlike server-based tools, YTools processes everything locally in your browser using WebAssembly. Your files never leave your device, keeping your content private.',
+  },
+  {
+    q: 'What video formats are supported?',
+    a: 'MP4, MOV, MKV, WebM, AVI, and GIF can all be compressed. The output is saved as MP4 for maximum compatibility.',
+  },
+];
+
+const related = [
+  { label: 'Compress Video to 8MB', href: '/compress-video-to-8mb' },
+  { label: 'MOV to MP4', href: '/mov-to-mp4' },
+  { label: 'MKV to MP4', href: '/mkv-to-mp4' },
+  { label: 'MP4 to GIF', href: '/mp4-to-gif' },
+  { label: 'Extract Audio', href: '/extract-audio' },
+];
+
+const faqJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+});
+
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Compress Video File',
+  description: 'Compress video files online for free, processed locally in your browser.',
+  step: steps.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: text,
+  })),
+});
 ---
 
 <Layout title="Compress Video File Online - Free Video Compressor | YTools"
@@ -14,5 +80,42 @@ export const prerender = true;
       Compress video files to reduce size for email, Discord, and social media. Free and processed locally in your browser — nothing is uploaded.
     </p>
     <VideoConverterTool client:only="react" />
+
+    <section class="mt-14 max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">How to Compress a Video</h2>
+      <ol class="space-y-4 mb-12">
+        {steps.map((step, i) => (
+          <li class="flex gap-4 items-start">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-primary-500/15 text-primary-500 flex items-center justify-center font-bold text-sm">{i + 1}</span>
+            <p class="text-text-muted pt-1">{step}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-4 mb-12">
+        {faqs.map((faq) => (
+          <div class="bg-base-900/40 rounded-2xl p-6 border border-black/5 dark:border-white/5">
+            <h3 class="text-text-main font-bold mb-2">{faq.q}</h3>
+            <p class="text-text-muted text-sm">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Related Tools</h2>
+      <div class="flex flex-wrap gap-3 justify-center">
+        {related.map((rel) => (
+          <a
+            href={rel.href}
+            class="px-4 py-2 rounded-xl bg-base-900/40 border border-black/5 dark:border-white/5 text-text-muted hover:text-primary-500 hover:border-primary-500/40 transition-colors text-sm"
+          >
+            {rel.label}
+          </a>
+        ))}
+      </div>
+    </section>
   </div>
+
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <script type="application/ld+json" set:html={howToJsonLd} />
 </Layout>
