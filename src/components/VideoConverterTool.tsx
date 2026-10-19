@@ -60,6 +60,7 @@ const FPS_OPTIONS = [
 ];
 
 const AUDIO_BITRATE_OPTIONS = ['128k', '192k', '256k'];
+const TARGET_SIZES = [8, 10, 20, 25];
 
 const X264_CRF: Record<string, number> = { high: 18, medium: 23, small: 28 };
 const VP9_CRF: Record<string, number> = { high: 24, medium: 30, small: 40 };
@@ -110,6 +111,13 @@ function getPreset() {
   };
 }
 
+function getPresetSize() {
+  if (typeof window === 'undefined') return null;
+  const raw = new URLSearchParams(window.location.search).get('size');
+  const n = parseFloat(raw || '');
+  return n > 0 && n <= 200 ? n : null;
+}
+
 export default function VideoConverterTool() {
   const [files, setFiles] = useState<File[]>([]);
   const [outputs, setOutputs] = useState<OutputEntry[]>([]);
@@ -126,6 +134,9 @@ export default function VideoConverterTool() {
   const [resolution, setResolution] = useState('original');
   const [fps, setFps] = useState('original');
   const [audioBitrate, setAudioBitrate] = useState('192k');
+  const [compressionMode, setCompressionMode] = useState<'quality' | 'target'>(() => (getPresetSize() ? 'target' : 'quality'));
+  const [targetSize, setTargetSize] = useState<number | null>(() => getPresetSize());
+  const [customTargetSize, setCustomTargetSize] = useState('');
   const [trimEnabled, setTrimEnabled] = useState(false);
   const [trimStart, setTrimStart] = useState('');
   const [trimEnd, setTrimEnd] = useState('');
@@ -217,7 +228,17 @@ export default function VideoConverterTool() {
         args.push('-c:v', 'mpeg4', '-q:v', String(AVI_QV[quality]));
         args.push('-c:a', 'libmp3lame', '-b:a', audioBitrate);
       } else {
-        args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', String(X264_CRF[quality]));
+        if (compressionMode === 'target' && targetSize && outputFormat === 'mp4') {
+          const durationSec = durationRef.current;
+          const audioKbps = parseInt(audioBitrate, 10);
+          const totalBits = targetSize * 8 * 1024 * 1024;
+          const audioBits = durationSec > 0 ? audioKbps * 1000 * durationSec : 0;
+          const videoBits = Math.max(totalBits - audioBits, totalBits * 0.85);
+          const videoKbps = durationSec > 0 ? Math.round(videoBits / 1000 / durationSec) : 2000;
+          args.push('-c:v', 'libx264', '-preset', 'medium', '-b:v', `${videoKbps}k`, '-maxrate', `${videoKbps}k`, '-bufsize', `${videoKbps * 2}k`);
+        } else {
+          args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', String(X264_CRF[quality]));
+        }
         args.push('-c:a', 'aac', '-b:a', audioBitrate);
         vf.push('format=yuv420p');
         if (outputFormat === 'mp4') args.push('-movflags', 'faststart');
@@ -403,11 +424,12 @@ export default function VideoConverterTool() {
                       <button
                         key={fmt.value}
                         onClick={() => setOutputFormat(fmt.value)}
+                        disabled={compressionMode === 'target' && fmt.value !== 'mp4'}
                         className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
                           outputFormat === fmt.value
                             ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
                             : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'
-                        }`}
+                        } ${compressionMode === 'target' && fmt.value !== 'mp4' ? 'opacity-40 cursor-not-allowed' : ''}`}
                       >
                         {fmt.label}
                       </button>
@@ -418,18 +440,62 @@ export default function VideoConverterTool() {
                 {outputFormat !== 'gif' && (
                   <div className="bg-base-900/40 p-5 rounded-xl border border-white/5 space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-text-main mb-2 block">Compression level:</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {QUALITY_OPTIONS.map((opt) => (
-                          <button key={opt.value} onClick={() => setQuality(opt.value)}
-                            className={`py-2 px-3 rounded-lg text-xs font-medium transition-all ${
-                              quality === opt.value ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'
-                            }`}>
-                            {opt.label}
-                          </button>
-                        ))}
+                      <label className="text-sm font-medium text-text-main mb-2 block">Compression method:</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={() => setCompressionMode('quality')}
+                          className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${compressionMode === 'quality' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'}`}>
+                          Quality
+                        </button>
+                        <button onClick={() => { setCompressionMode('target'); setOutputFormat('mp4'); if (!targetSize) setTargetSize(8); }}
+                          className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${compressionMode === 'target' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'}`}>
+                          Target size
+                        </button>
                       </div>
                     </div>
+
+                    {compressionMode === 'quality' ? (
+                      <div>
+                        <label className="text-sm font-medium text-text-main mb-2 block">Compression level:</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {QUALITY_OPTIONS.map((opt) => (
+                            <button key={opt.value} onClick={() => setQuality(opt.value)}
+                              className={`py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+                                quality === opt.value ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'
+                              }`}>
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="text-sm font-medium text-text-main mb-2 block">Target size:</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {TARGET_SIZES.map((size) => (
+                            <button key={size} onClick={() => setTargetSize(size)}
+                              className={`py-2 px-2 rounded-lg text-xs font-medium transition-all ${targetSize === size ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-base-800 text-text-muted hover:text-text-main hover:bg-base-700'}`}>
+                              {size}MB
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2 mt-3">
+                          <input
+                            type="number"
+                            min="1"
+                            max="200"
+                            placeholder="Custom MB"
+                            value={customTargetSize}
+                            onChange={(e) => setCustomTargetSize(e.target.value)}
+                            className="w-full bg-base-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-text-main focus:outline-none focus:border-primary-500"
+                          />
+                          <button onClick={() => { const v = parseFloat(customTargetSize); if (v > 0) setTargetSize(v); }}
+                            className="shrink-0 px-4 py-2 bg-base-800 hover:bg-base-700 text-text-main rounded-lg text-sm font-medium transition-colors">
+                            Set
+                          </button>
+                        </div>
+                        <p className="text-xs text-text-muted mt-2">Approximate (±15%). Very long videos may look blurry at small target sizes.</p>
+                      </div>
+                    )}
                     <div>
                       <label className="text-sm font-medium text-text-main mb-2 block">Resolution:</label>
                       <div className="grid grid-cols-4 gap-2">

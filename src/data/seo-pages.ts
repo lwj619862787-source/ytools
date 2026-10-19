@@ -10,10 +10,11 @@ export interface SeoPage {
   keywords: string;
   h1: string;
   intro: string;
-  toolPath: '/video-converter' | '/extract-audio' | '/audio-converter';
+  toolPath: '/video-converter' | '/extract-audio' | '/audio-converter' | '/video-compress';
   ctaLabel: string;
   from?: string;
   to?: string;
+  size?: number;
   steps: string[];
   faqs: SeoFaq[];
   related: { label: string; href: string }[];
@@ -337,6 +338,57 @@ export const seoPages: SeoPage[] = [
       { label: 'Video Converter', href: '/video-converter' },
       { label: 'MKV to MP3', href: '/mkv-to-mp3' },
       { label: 'WebM to MP3', href: '/webm-to-mp3' },
+    ],
+  },
+  {
+    slug: 'compress-video-to-8mb',
+    title: 'Compress Video to 8MB - Free Online Video Compressor | YTools',
+    description:
+      'Compress any video to under 8MB for free. Perfect for Discord uploads. Processed locally in your browser — nothing is uploaded to a server.',
+    keywords: 'compress video to 8mb, 8mb video compressor, compress video for discord, discord video too large, reduce video to 8mb',
+    h1: 'Compress Video to 8MB',
+    intro:
+      'Shrink any video to under 8MB for Discord, email, and messaging apps. Free, private, and processed entirely in your browser — your file never leaves your device.',
+    toolPath: '/video-compress',
+    ctaLabel: 'Compress to 8MB Now',
+    size: 8,
+    steps: [
+      'Upload your video by clicking the button or dragging it into the drop zone.',
+      'The target size is already set to 8MB — just click "Compress".',
+      'Download your compressed video instantly — no sign-up, no watermark.',
+    ],
+    faqs: [
+      {
+        q: 'How do I compress a video to 8MB?',
+        a: 'Upload your video, and the target size is pre-set to 8MB. Click "Compress" and the tool shrinks it to around 8MB using a calculated bitrate — entirely in your browser.',
+      },
+      {
+        q: 'Why 8MB?',
+        a: '8MB is the file upload limit for free Discord accounts, and a common limit for messaging apps and some email attachments. Compressing to 8MB keeps your video shareable almost everywhere.',
+      },
+      {
+        q: 'Will compressing to 8MB ruin the quality?',
+        a: 'It depends on length. Short clips compress to 8MB with minimal quality loss, while longer videos require a lower bitrate and may look softer. For best results, keep the resolution reasonable.',
+      },
+      {
+        q: 'Is my video uploaded to a server?',
+        a: 'No. All processing happens locally in your browser using WebAssembly. Your file never leaves your device, keeping it completely private.',
+      },
+      {
+        q: 'What formats can I compress?',
+        a: 'MP4, MOV, MKV, WebM, AVI, and GIF are supported. The compressed output is saved as MP4, the most widely compatible format.',
+      },
+      {
+        q: 'Is compressing to 8MB free?',
+        a: 'Yes. There are no fees, watermarks, or file-size caps beyond browser limits. You can compress as many videos as you like.',
+      },
+    ],
+    related: [
+      { label: 'Video Compressor', href: '/video-compress' },
+      { label: 'MOV to MP4', href: '/mov-to-mp4' },
+      { label: 'MKV to MP4', href: '/mkv-to-mp4' },
+      { label: 'MP4 to GIF', href: '/mp4-to-gif' },
+      { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
     ],
   },
 ];

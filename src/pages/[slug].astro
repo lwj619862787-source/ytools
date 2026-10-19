@@ -17,6 +17,7 @@ const { page } = Astro.props;
 const params = new URLSearchParams();
 if (page.from) params.set('from', page.from);
 if (page.to) params.set('to', page.to);
+if (page.size) params.set('size', String(page.size));
 const query = params.toString();
 const ctaUrl = `${page.toolPath}${query ? `?${query}` : ''}`;
 
