@@ -10,6 +10,7 @@
   "dependencies": {
     "@astrojs/cloudflare": "^13.6.0",
     "@astrojs/react": "^5.0.6",
+    "@astrojs/sitemap": "^3.7.4",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@tailwindcss/typography": "^0.5.19",
