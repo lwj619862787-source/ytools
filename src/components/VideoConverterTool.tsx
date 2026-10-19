@@ -17,6 +17,8 @@ interface OutputEntry {
   name: string;
   blob: Blob;
   url: string;
+  size: number;
+  originalSize: number;
 }
 
 const inputFormats: FormatOption[] = [
@@ -38,9 +40,9 @@ const outputFormats: FormatOption[] = [
 ];
 
 const QUALITY_OPTIONS = [
-  { value: 'high', label: 'High quality' },
-  { value: 'medium', label: 'Balanced' },
-  { value: 'small', label: 'Smaller file' },
+  { value: 'high', label: 'Light (best quality)' },
+  { value: 'medium', label: 'Balanced (recommended)' },
+  { value: 'small', label: 'Strong (smallest size)' },
 ];
 
 const RESOLUTION_OPTIONS = [
@@ -68,6 +70,13 @@ function formatDuration(seconds: number): string {
   const m = Math.floor(s / 60);
   const r = s % 60;
   return m > 0 ? `${m}m ${r}s` : `${r}s`;
+}
+
+function formatSize(bytes: number): string {
+  if (!bytes || bytes <= 0) return '0 MB';
+  const mb = bytes / 1024 / 1024;
+  if (mb >= 1) return `${mb.toFixed(2)} MB`;
+  return `${(bytes / 1024).toFixed(0)} KB`;
 }
 
 function getDuration(file: File): Promise<number> {
@@ -237,7 +246,7 @@ export default function VideoConverterTool() {
       const blob = new Blob([data], { type: outputFormats.find((f) => f.value === outputFormat)?.mime || 'video/mp4' });
       await ffmpeg.deleteFile(inputName);
       await ffmpeg.deleteFile(outputName);
-      return { name: `${baseName}.${outputFormat}`, blob, url: URL.createObjectURL(blob) };
+      return { name: `${baseName}.${outputFormat}`, blob, url: URL.createObjectURL(blob), size: blob.size, originalSize: file.size };
     } catch (err) {
       console.error('Processing error:', err);
       return null;
@@ -311,7 +320,7 @@ export default function VideoConverterTool() {
 
         <div className="flex items-center gap-3 mb-6">
           <FileVideo className="w-6 h-6 text-primary-500" />
-          <h3 className="text-xl font-bold text-text-main">Video Converter</h3>
+          <h3 className="text-xl font-bold text-text-main">{presetFrom ? 'Video Converter' : 'Video Compressor'}</h3>
         </div>
 
         {(presetFrom || outputFormat) && files.length === 0 && (
@@ -409,7 +418,7 @@ export default function VideoConverterTool() {
                 {outputFormat !== 'gif' && (
                   <div className="bg-base-900/40 p-5 rounded-xl border border-white/5 space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-text-main mb-2 block">Quality:</label>
+                      <label className="text-sm font-medium text-text-main mb-2 block">Compression level:</label>
                       <div className="grid grid-cols-3 gap-2">
                         {QUALITY_OPTIONS.map((opt) => (
                           <button key={opt.value} onClick={() => setQuality(opt.value)}
@@ -507,9 +516,9 @@ export default function VideoConverterTool() {
                   )}
                   <span className="relative z-10 flex items-center gap-2">
                     {isProcessing ? (
-                      <><RefreshCw className="w-5 h-5 animate-spin" /> Converting {currentIndex + 1}/{files.length} · {progress}%{remainingTime ? ` · ${remainingTime} left` : ''}</>
+                      <><RefreshCw className="w-5 h-5 animate-spin" /> Compressing {currentIndex + 1}/{files.length} · {progress}%{remainingTime ? ` · ${remainingTime} left` : ''}</>
                     ) : (
-                      <><Play className="w-5 h-5" /> Convert {files.length} file{files.length > 1 ? 's' : ''}</>
+                      <><Play className="w-5 h-5" /> Compress {files.length} file{files.length > 1 ? 's' : ''}</>
                     )}
                   </span>
                 </button>
@@ -522,8 +531,29 @@ export default function VideoConverterTool() {
                   <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Download className="w-8 h-8" />
                   </div>
-                  <h4 className="text-xl font-bold text-green-400 mb-2">Conversion Complete!</h4>
-                  <p className="text-sm text-text-muted mb-4">{outputs.length} file{outputs.length > 1 ? 's' : ''} converted to {outputFormat.toUpperCase()}.</p>
+                  <h4 className="text-xl font-bold text-green-400 mb-2">Compression Complete!</h4>
+                  <p className="text-sm text-text-muted mb-4">{outputs.length} file{outputs.length > 1 ? 's' : ''} processed to {outputFormat.toUpperCase()}.</p>
+                  {(() => {
+                    const totalOriginal = outputs.reduce((s, o) => s + o.originalSize, 0);
+                    const totalNew = outputs.reduce((s, o) => s + o.size, 0);
+                    const savedPct = totalOriginal > 0 ? Math.round((1 - totalNew / totalOriginal) * 100) : 0;
+                    return (
+                      <div className="mb-4 p-4 bg-green-500/10 rounded-xl text-left text-sm">
+                        <div className="flex justify-between mb-1">
+                          <span className="text-text-muted">Original size</span>
+                          <span className="text-text-main font-medium">{formatSize(totalOriginal)}</span>
+                        </div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-text-muted">New size</span>
+                          <span className="text-green-400 font-medium">{formatSize(totalNew)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-text-muted">Space saved</span>
+                          <span className="text-green-400 font-bold">{savedPct > 0 ? `${savedPct}%` : '—'}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {outputs.length > 1 && (
                     <button onClick={downloadAll} disabled={isZipping}
                       className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white rounded-xl font-bold transition-all shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 mb-3">
@@ -533,20 +563,29 @@ export default function VideoConverterTool() {
                 </div>
 
                 <div className="bg-base-900/40 rounded-xl border border-white/5 divide-y divide-white/5">
-                  {outputs.map((o, i) => (
-                    <div key={i} className="flex items-center justify-between px-4 py-2.5 text-sm">
-                      <span className="text-text-main truncate max-w-[300px]">{o.name}</span>
-                      <button onClick={() => downloadOne(o)}
-                        className="flex items-center gap-1.5 text-primary-500 hover:text-primary-400 transition-colors text-xs font-medium">
-                        <Download className="w-4 h-4" /> Download
-                      </button>
-                    </div>
-                  ))}
+                  {outputs.map((o, i) => {
+                    const saved = o.originalSize > 0 ? Math.round((1 - o.size / o.originalSize) * 100) : 0;
+                    return (
+                      <div key={i} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                        <div className="min-w-0 flex-1">
+                          <span className="text-text-main truncate block max-w-[260px]">{o.name}</span>
+                          <span className="text-xs text-text-muted">
+                            {formatSize(o.originalSize)} → <span className="text-green-400">{formatSize(o.size)}</span>
+                            {saved > 0 ? ` · ${saved}% smaller` : ''}
+                          </span>
+                        </div>
+                        <button onClick={() => downloadOne(o)}
+                          className="flex items-center gap-1.5 text-primary-500 hover:text-primary-400 transition-colors text-xs font-medium shrink-0">
+                          <Download className="w-4 h-4" /> Download
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <button onClick={reset}
                   className="w-full py-3 bg-base-800 hover:bg-base-700 text-text-main rounded-xl font-bold transition-colors text-sm">
-                  Convert More Files
+                  Compress More Files
                 </button>
               </div>
             )}

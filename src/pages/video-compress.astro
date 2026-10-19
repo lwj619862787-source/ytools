@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VideoConverterTool from '../components/VideoConverterTool';
+
+export const prerender = true;
+---
+
+<Layout title="Compress Video File Online - Free Video Compressor | YTools"
+    description="Compress video files online for free. Reduce MP4, MOV, and WebM size for email, Discord, and social media — processed locally in your browser, nothing is uploaded."
+    keywords="compress video file, video compressor, compress video online, reduce video file size, shrink video, compress mp4, compress mov, make video smaller">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 text-center">Compress Video File</h1>
+    <p class="text-text-muted text-lg text-center mb-8">
+      Compress video files to reduce size for email, Discord, and social media. Free and processed locally in your browser — nothing is uploaded.
+    </p>
+    <VideoConverterTool client:only="react" />
+  </div>
+</Layout>
