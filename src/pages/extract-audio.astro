@@ -3,6 +3,72 @@ import Layout from '../layouts/Layout.astro';
 import ExtractAudioTool from '../components/ExtractAudioTool';
 
 export const prerender = true;
+
+const steps = [
+  'Upload your video by clicking the button or dragging it into the drop zone.',
+  'Choose an audio track if your video has more than one.',
+  'Click "Start Processing" and download the MP3.',
+];
+
+const faqs = [
+  {
+    q: 'How do I extract audio from a video?',
+    a: 'Upload your video, click "Start Processing", and the tool extracts the audio track and saves it as an MP3. It works entirely in your browser.',
+  },
+  {
+    q: 'What video formats are supported?',
+    a: 'MP4, MOV, MKV, WebM, AVI, and most other common video formats are supported for audio extraction.',
+  },
+  {
+    q: 'What is the output format?',
+    a: 'The extracted audio is saved as MP3, the most widely compatible audio format. It uses high-quality encoding for the best sound.',
+  },
+  {
+    q: 'Can I choose which audio track to extract?',
+    a: 'Yes. If your video contains multiple audio tracks (for example, multiple languages), you can pick the one you want before processing.',
+  },
+  {
+    q: 'Is my video uploaded to a server?',
+    a: 'No. All processing happens locally in your browser using WebAssembly. Your files never leave your device.',
+  },
+  {
+    q: 'Is the audio extractor free?',
+    a: 'Yes. It is completely free with no watermarks, size limits, or hidden fees.',
+  },
+];
+
+const related = [
+  { label: 'MOV to MP3', href: '/mov-to-mp3' },
+  { label: 'MKV to MP3', href: '/mkv-to-mp3' },
+  { label: 'WebM to MP3', href: '/webm-to-mp3' },
+  { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+  { label: 'Audio Converter', href: '/audio-converter' },
+];
+
+const faqJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+});
+
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Extract Audio from Video',
+  description: 'Extract MP3 audio from any video file for free, processed locally in your browser.',
+  step: steps.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: text,
+  })),
+});
 ---
 
 <Layout title="Extract Audio from Video - Video to MP3 | YTools"
@@ -14,5 +80,42 @@ export const prerender = true;
       Rip MP3 audio tracks from any video file. Processed locally in your browser - nothing is uploaded.
     </p>
     <ExtractAudioTool client:only="react" />
+
+    <section class="mt-14 max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">How to Extract Audio from Video</h2>
+      <ol class="space-y-4 mb-12">
+        {steps.map((step, i) => (
+          <li class="flex gap-4 items-start">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-primary-500/15 text-primary-500 flex items-center justify-center font-bold text-sm">{i + 1}</span>
+            <p class="text-text-muted pt-1">{step}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-4 mb-12">
+        {faqs.map((faq) => (
+          <div class="bg-base-900/40 rounded-2xl p-6 border border-black/5 dark:border-white/5">
+            <h3 class="text-text-main font-bold mb-2">{faq.q}</h3>
+            <p class="text-text-muted text-sm">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Related Tools</h2>
+      <div class="flex flex-wrap gap-3 justify-center">
+        {related.map((rel) => (
+          <a
+            href={rel.href}
+            class="px-4 py-2 rounded-xl bg-base-900/40 border border-black/5 dark:border-white/5 text-text-muted hover:text-primary-500 hover:border-primary-500/40 transition-colors text-sm"
+          >
+            {rel.label}
+          </a>
+        ))}
+      </div>
+    </section>
   </div>
+
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <script type="application/ld+json" set:html={howToJsonLd} />
 </Layout>

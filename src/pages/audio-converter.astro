@@ -3,6 +3,71 @@ import Layout from '../layouts/Layout.astro';
 import AudioConverterTool from '../components/AudioConverterTool';
 
 export const prerender = true;
+
+const steps = [
+  'Upload your audio file by clicking the button or dragging it into the drop zone.',
+  'Choose an output format — MP3, WAV, M4A, OGG, FLAC, or OPUS.',
+  'Click "Start Conversion" and download your file instantly.',
+];
+
+const faqs = [
+  {
+    q: 'How do I convert audio files online?',
+    a: 'Upload your audio file, choose an output format, and click "Start Conversion". The tool converts it in seconds — entirely in your browser.',
+  },
+  {
+    q: 'What audio formats are supported?',
+    a: 'MP3, WAV, M4A, AAC, OGG, FLAC, and OPUS are supported as input and output formats.',
+  },
+  {
+    q: 'Will converting to MP3 lose quality?',
+    a: 'MP3 is a lossy format, so some quality is lost in exchange for a much smaller file size. WAV and FLAC are lossless and preserve the original quality.',
+  },
+  {
+    q: 'Can I convert FLAC to MP3?',
+    a: 'Yes. Upload your FLAC file, select MP3 as the output format, and the tool converts it in seconds while keeping good quality.',
+  },
+  {
+    q: 'Is my audio uploaded to a server?',
+    a: 'No. All processing happens locally in your browser using WebAssembly. Your files never leave your device.',
+  },
+  {
+    q: 'Is the audio converter free?',
+    a: 'Yes. It is completely free with no watermarks, size limits, or hidden fees.',
+  },
+];
+
+const related = [
+  { label: 'WAV to MP3', href: '/wav-to-mp3' },
+  { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+  { label: 'Extract Audio', href: '/extract-audio' },
+  { label: 'Compress Video', href: '/video-compress' },
+];
+
+const faqJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+});
+
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Audio Converter',
+  description: 'Convert audio files between MP3, WAV, M4A, OGG, FLAC, and OPUS formats for free, locally in your browser.',
+  step: steps.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: text,
+  })),
+});
 ---
 
 <Layout title="Audio Converter - Free Online Audio Format Converter | YTools"
@@ -14,5 +79,42 @@ export const prerender = true;
       Convert audio files between MP3, WAV, M4A, OGG, FLAC, and OPUS formats for free. All processing happens locally in your browser - nothing is uploaded.
     </p>
     <AudioConverterTool client:only="react" />
+
+    <section class="mt-14 max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">How to Convert Audio Files</h2>
+      <ol class="space-y-4 mb-12">
+        {steps.map((step, i) => (
+          <li class="flex gap-4 items-start">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-primary-500/15 text-primary-500 flex items-center justify-center font-bold text-sm">{i + 1}</span>
+            <p class="text-text-muted pt-1">{step}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-4 mb-12">
+        {faqs.map((faq) => (
+          <div class="bg-base-900/40 rounded-2xl p-6 border border-black/5 dark:border-white/5">
+            <h3 class="text-text-main font-bold mb-2">{faq.q}</h3>
+            <p class="text-text-muted text-sm">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Related Tools</h2>
+      <div class="flex flex-wrap gap-3 justify-center">
+        {related.map((rel) => (
+          <a
+            href={rel.href}
+            class="px-4 py-2 rounded-xl bg-base-900/40 border border-black/5 dark:border-white/5 text-text-muted hover:text-primary-500 hover:border-primary-500/40 transition-colors text-sm"
+          >
+            {rel.label}
+          </a>
+        ))}
+      </div>
+    </section>
   </div>
+
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <script type="application/ld+json" set:html={howToJsonLd} />
 </Layout>

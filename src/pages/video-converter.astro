@@ -3,6 +3,72 @@ import Layout from '../layouts/Layout.astro';
 import VideoConverterTool from '../components/VideoConverterTool';
 
 export const prerender = true;
+
+const steps = [
+  'Upload your video by clicking the button or dragging it into the drop zone.',
+  'Choose an output format — MP4, WebM, GIF, AVI, MKV, or MOV.',
+  'Click "Convert" and download your file instantly.',
+];
+
+const faqs = [
+  {
+    q: 'How do I convert a video to MP4?',
+    a: 'Upload your video, select "MP4 (H.264)" as the output format, and click "Convert". The tool re-encodes it as a compatible MP4 — entirely in your browser.',
+  },
+  {
+    q: 'What video formats are supported?',
+    a: 'You can convert between MP4, WebM, AVI, MOV, MKV, and GIF. iPhone HEVC and HDR videos are also supported, with an option to convert HDR to SDR.',
+  },
+  {
+    q: 'Can I convert MOV to MP4?',
+    a: 'Yes. MOV is fully supported as an input format. Upload your .mov file, choose MP4, and convert it in seconds.',
+  },
+  {
+    q: 'Will converting reduce video quality?',
+    a: 'It can. Re-encoding always has some effect. Choose "Light (best quality)" for the highest output quality, or keep your original resolution to minimize loss.',
+  },
+  {
+    q: 'Is my video uploaded to a server?',
+    a: 'No. All processing happens locally in your browser using WebAssembly. Your files never leave your device.',
+  },
+  {
+    q: 'Can I convert multiple videos at once?',
+    a: 'Yes. Add multiple files and they are processed in a batch. You can download them individually or as a single ZIP file.',
+  },
+];
+
+const related = [
+  { label: 'Compress Video', href: '/video-compress' },
+  { label: 'MOV to MP4', href: '/mov-to-mp4' },
+  { label: 'MKV to MP4', href: '/mkv-to-mp4' },
+  { label: 'MP4 to GIF', href: '/mp4-to-gif' },
+  { label: 'Extract Audio', href: '/extract-audio' },
+];
+
+const faqJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+});
+
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Video Converter',
+  description: 'Convert videos between MP4, WebM, AVI, MOV, MKV, and GIF formats for free, locally in your browser.',
+  step: steps.map((text, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: text,
+  })),
+});
 ---
 
 <Layout title="Video Converter - Free Online Format Converter | YTools"
@@ -14,5 +80,42 @@ export const prerender = true;
       Convert videos between MP4, WebM, AVI, MOV, and GIF formats for free. All processing happens locally in your browser - nothing is uploaded.
     </p>
     <VideoConverterTool client:only="react" />
+
+    <section class="mt-14 max-w-3xl mx-auto">
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">How to Convert a Video</h2>
+      <ol class="space-y-4 mb-12">
+        {steps.map((step, i) => (
+          <li class="flex gap-4 items-start">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-primary-500/15 text-primary-500 flex items-center justify-center font-bold text-sm">{i + 1}</span>
+            <p class="text-text-muted pt-1">{step}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-4 mb-12">
+        {faqs.map((faq) => (
+          <div class="bg-base-900/40 rounded-2xl p-6 border border-black/5 dark:border-white/5">
+            <h3 class="text-text-main font-bold mb-2">{faq.q}</h3>
+            <p class="text-text-muted text-sm">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="text-2xl font-bold text-text-main mb-6 text-center">Related Tools</h2>
+      <div class="flex flex-wrap gap-3 justify-center">
+        {related.map((rel) => (
+          <a
+            href={rel.href}
+            class="px-4 py-2 rounded-xl bg-base-900/40 border border-black/5 dark:border-white/5 text-text-muted hover:text-primary-500 hover:border-primary-500/40 transition-colors text-sm"
+          >
+            {rel.label}
+          </a>
+        ))}
+      </div>
+    </section>
   </div>
+
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <script type="application/ld+json" set:html={howToJsonLd} />
 </Layout>
