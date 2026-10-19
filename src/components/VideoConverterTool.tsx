@@ -147,6 +147,7 @@ export default function VideoConverterTool() {
   const ffmpegRef = useRef<FFmpeg | null>(null);
 
   const presetFrom = getPreset().from;
+  const isCompressPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/video-compress');
 
   const loadFFmpeg = async () => {
     if (isLoaded) return;
@@ -341,7 +342,7 @@ export default function VideoConverterTool() {
 
         <div className="flex items-center gap-3 mb-6">
           <FileVideo className="w-6 h-6 text-primary-500" />
-          <h3 className="text-xl font-bold text-text-main">{presetFrom ? 'Video Converter' : 'Video Compressor'}</h3>
+          <h3 className="text-xl font-bold text-text-main">{isCompressPage ? 'Video Compressor' : 'Video Converter'}</h3>
         </div>
 
         {(presetFrom || outputFormat) && files.length === 0 && (
@@ -582,9 +583,9 @@ export default function VideoConverterTool() {
                   )}
                   <span className="relative z-10 flex items-center gap-2">
                     {isProcessing ? (
-                      <><RefreshCw className="w-5 h-5 animate-spin" /> Compressing {currentIndex + 1}/{files.length} · {progress}%{remainingTime ? ` · ${remainingTime} left` : ''}</>
+                      <><RefreshCw className="w-5 h-5 animate-spin" /> {isCompressPage ? 'Compressing' : 'Converting'} {currentIndex + 1}/{files.length} · {progress}%{remainingTime ? ` · ${remainingTime} left` : ''}</>
                     ) : (
-                      <><Play className="w-5 h-5" /> Compress {files.length} file{files.length > 1 ? 's' : ''}</>
+                      <><Play className="w-5 h-5" /> {isCompressPage ? 'Compress' : 'Convert'} {files.length} file{files.length > 1 ? 's' : ''}</>
                     )}
                   </span>
                 </button>
@@ -597,7 +598,7 @@ export default function VideoConverterTool() {
                   <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Download className="w-8 h-8" />
                   </div>
-                  <h4 className="text-xl font-bold text-green-400 mb-2">Compression Complete!</h4>
+                  <h4 className="text-xl font-bold text-green-400 mb-2">{isCompressPage ? 'Compression Complete!' : 'Conversion Complete!'}</h4>
                   <p className="text-sm text-text-muted mb-4">{outputs.length} file{outputs.length > 1 ? 's' : ''} processed to {outputFormat.toUpperCase()}.</p>
                   {(() => {
                     const totalOriginal = outputs.reduce((s, o) => s + o.originalSize, 0);
@@ -651,7 +652,7 @@ export default function VideoConverterTool() {
 
                 <button onClick={reset}
                   className="w-full py-3 bg-base-800 hover:bg-base-700 text-text-main rounded-xl font-bold transition-colors text-sm">
-                  Compress More Files
+                  {isCompressPage ? 'Compress' : 'Convert'} More Files
                 </button>
               </div>
             )}
