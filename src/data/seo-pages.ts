@@ -56,6 +56,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MKV to MP3', href: '/mkv-to-mp3' },
       { label: 'WebM to MP3', href: '/webm-to-mp3' },
       { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+      { label: 'MOV to MP4', href: '/mov-to-mp4' },
       { label: 'Extract Audio Tool', href: '/extract-audio' },
     ],
   },
@@ -95,6 +96,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MOV to MP3', href: '/mov-to-mp3' },
       { label: 'MKV to MP3', href: '/mkv-to-mp3' },
       { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+      { label: 'MKV to MP4', href: '/mkv-to-mp4' },
       { label: 'Extract Audio Tool', href: '/extract-audio' },
     ],
   },
@@ -134,6 +136,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MOV to MP3', href: '/mov-to-mp3' },
       { label: 'WebM to MP3', href: '/webm-to-mp3' },
       { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+      { label: 'MKV to MP4', href: '/mkv-to-mp4' },
       { label: 'Extract Audio Tool', href: '/extract-audio' },
     ],
   },
@@ -172,6 +175,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MOV to MP3', href: '/mov-to-mp3' },
       { label: 'MKV to MP3', href: '/mkv-to-mp3' },
       { label: 'WebM to MP3', href: '/webm-to-mp3' },
+      { label: 'WAV to MP3', href: '/wav-to-mp3' },
       { label: 'Audio Converter', href: '/audio-converter' },
     ],
   },
@@ -209,8 +213,10 @@ export const seoPages: SeoPage[] = [
     ],
     related: [
       { label: 'Audio Converter', href: '/audio-converter' },
-      { label: 'MOV to MP3', href: '/mov-to-mp3' },
       { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+      { label: 'MOV to MP3', href: '/mov-to-mp3' },
+      { label: 'MKV to MP3', href: '/mkv-to-mp3' },
+      { label: 'WebM to MP3', href: '/webm-to-mp3' },
     ],
   },
   {
@@ -250,6 +256,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MP4 to GIF', href: '/mp4-to-gif' },
       { label: 'Video Converter', href: '/video-converter' },
       { label: 'MOV to MP3', href: '/mov-to-mp3' },
+      { label: 'MKV to MP3', href: '/mkv-to-mp3' },
     ],
   },
   {
@@ -288,6 +295,8 @@ export const seoPages: SeoPage[] = [
       { label: 'MOV to MP4', href: '/mov-to-mp4' },
       { label: 'MKV to MP4', href: '/mkv-to-mp4' },
       { label: 'Video Converter', href: '/video-converter' },
+      { label: 'Extract Audio from Video', href: '/extract-audio-from-video' },
+      { label: 'MOV to MP3', href: '/mov-to-mp3' },
     ],
   },
   {
@@ -327,6 +336,7 @@ export const seoPages: SeoPage[] = [
       { label: 'MP4 to GIF', href: '/mp4-to-gif' },
       { label: 'Video Converter', href: '/video-converter' },
       { label: 'MKV to MP3', href: '/mkv-to-mp3' },
+      { label: 'WebM to MP3', href: '/webm-to-mp3' },
     ],
   },
 ];
